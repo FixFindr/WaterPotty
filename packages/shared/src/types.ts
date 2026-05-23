@@ -26,7 +26,6 @@ export type FlagInsert = Database['public']['Tables']['flags']['Insert']
 // ─── Enum types ─────────────────────────────────────────────────────────────
 
 export type WashroomType = Database['public']['Enums']['washroom_type']
-export type WashroomStatus = Database['public']['Enums']['washroom_status']
 export type UserRole = Database['public']['Enums']['user_role']
 export type UserTier = Database['public']['Enums']['user_tier']
 export type Cleanliness = Database['public']['Enums']['cleanliness']
@@ -34,18 +33,8 @@ export type VerificationStatus = Database['public']['Enums']['verification_statu
 export type FlagReason = Database['public']['Enums']['flag_reason']
 export type CreditReason = Database['public']['Enums']['credit_reason']
 
-// ─── Map marker config ───────────────────────────────────────────────────────
-
-export type MarkerBaseColor = 'green' | 'yellow' | 'red' | 'grey'
-export type MarkerAccessSymbol = 'heart' | 'bowtie'
-export type MarkerCleanlinessSymbol = 'thumbs-up' | 'thumbs-down' | 'question'
-
-export type MarkerConfig = {
-  baseColor: MarkerBaseColor
-  accessSymbol: MarkerAccessSymbol
-  cleanlinessSymbol: MarkerCleanlinessSymbol
-  interactive: boolean
-}
+// Marker types (MarkerConfig, BaseColor, WashroomStatus, etc.) are owned by
+// ./markerConfig and re-exported via the package index.
 
 // ─── Enriched types ──────────────────────────────────────────────────────────
 
