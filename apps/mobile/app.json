@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Water Potty",
-    "slug": "water-potty",
+    "slug": "watty",
     "version": "1.0.0",
     "scheme": "waterpotty",
     "orientation": "portrait",
@@ -66,8 +66,12 @@
     },
     "extra": {
       "eas": {
-        "projectId": "YOUR_EAS_PROJECT_ID"
+        "projectId": "768377a0-4d55-4352-8059-0e16cb6bb809"
+      },
+      "router": {
+        "origin": false
       }
-    }
+    },
+    "owner": "watty_yvr"
   }
 }
