@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "lib": ["ES2020"],
+    "noEmit": false,
+    "outDir": "./dist",
+    "rootDir": ".",
+    "composite": true
+  },
+  "include": ["src/**/*.tsx", "src/**/*.ts", "index.ts"],
+  "exclude": ["node_modules", "dist"]
+}

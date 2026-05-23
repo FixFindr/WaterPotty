@@ -1,0 +1,16 @@
+{
+  "name": "@water-potty/shared",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@water-potty/db": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

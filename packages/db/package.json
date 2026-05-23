@@ -1,0 +1,15 @@
+{
+  "name": "@water-potty/db",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "generate": "supabase gen types typescript --linked > src/types.ts"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.49.4",
+    "typescript": "^5.0.0"
+  }
+}

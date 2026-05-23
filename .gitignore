@@ -1,0 +1,66 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+.next/
+dist/
+build/
+out/
+
+# Expo / React Native
+.expo/
+*.jks
+*.keystore
+*.mobileprovision
+*.p8
+*.p12
+*.cer
+ios/build/
+android/build/
+android/.gradle/
+
+# EAS
+.easignore
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Supabase
+.branches/
+.temp/
+supabase/.temp/
+
+# Turbo
+.turbo/
+
+# Vercel
+.vercel/
+
+# OS
+.DS_Store
+*.pem
+Thumbs.db
+
+# Office lock files
+~$*
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# TypeScript
+*.tsbuildinfo
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
