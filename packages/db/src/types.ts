@@ -243,7 +243,7 @@ export type Database = {
           photo_url: string | null
           resolved_at: string | null
           status: Database['public']['Enums']['verification_status']
-          submitter_id: string | null
+          submitter_id: string           // NOT NULL — the subscriber who submitted
           verifier_id: string | null
           washroom_id: string
         }
@@ -254,7 +254,7 @@ export type Database = {
           photo_url?: string | null
           resolved_at?: string | null
           status?: Database['public']['Enums']['verification_status']
-          submitter_id?: string | null
+          submitter_id: string           // required on insert
           verifier_id?: string | null
           washroom_id: string
         }
@@ -265,7 +265,7 @@ export type Database = {
           photo_url?: string | null
           resolved_at?: string | null
           status?: Database['public']['Enums']['verification_status']
-          submitter_id?: string | null
+          submitter_id?: string
           verifier_id?: string | null
           washroom_id?: string
         }
