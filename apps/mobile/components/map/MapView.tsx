@@ -33,6 +33,15 @@ interface ActivePin {
   expiresAt: string // ISO string
 }
 
+interface Props {
+  /** Called when the user long-presses the map; coordinates for pin drop. */
+  onLongPress?: (lat: number, lng: number) => void
+  /** Called after a pin is successfully created (for parent FAB/prompt positioning). */
+  onPinCreated?: () => void
+  /** Called after a pin is released or expired. */
+  onPinReleased?: () => void
+}
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const DEFAULT_ZOOM = 14
@@ -47,7 +56,7 @@ function kmToDegrees(km: number) {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function WaterPottyMapView() {
+export function WaterPottyMapView({ onLongPress, onPinCreated, onPinReleased }: Props = {}) {
   const { session, profile } = useAuth()
 
   const mapRef = useRef<MapboxGL.MapView>(null)
@@ -178,11 +187,21 @@ export function WaterPottyMapView() {
   // ── Pin actions (called from PinBottomSheet) ──────────────────────────────
   const handlePinCreated = useCallback((washroomId: string, expiresAt: string) => {
     setActivePin({ washroomId, expiresAt })
-  }, [])
+    onPinCreated?.()
+  }, [onPinCreated])
 
   const handlePinReleased = useCallback(() => {
     setActivePin(null)
-  }, [])
+    onPinReleased?.()
+  }, [onPinReleased])
+
+  // ── Map long-press: extract coordinates and forward to parent ─────────────
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleMapLongPress = useCallback((feature: any) => {
+    if (!onLongPress) return
+    const [lng, lat] = feature.geometry.coordinates
+    onLongPress(lat, lng)
+  }, [onLongPress])
 
   // ── Map region change: reload washrooms for new area ─────────────────────
   const handleRegionDidChange = useCallback(async (feature: any) => {
@@ -211,6 +230,7 @@ export function WaterPottyMapView() {
         attributionEnabled={false}
         compassEnabled
         onRegionDidChange={handleRegionDidChange}
+        onLongPress={handleMapLongPress}
       >
         {/* Camera */}
         <MapboxGL.Camera

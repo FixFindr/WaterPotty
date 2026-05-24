@@ -1,17 +1,162 @@
-import { Text, View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+/**
+ * app/(tabs)/index.tsx
+ *
+ * Water Potty — Map Tab (root screen)
+ *
+ * Orchestrates all map-layer components:
+ *   • WaterPottyMapView      — Mapbox map + markers + PinTimer
+ *   • AddWashroomModal       — subscriber add-washroom flow (FAB / long press)
+ *   • VerificationPrompt     — nearby pending washroom banner
+ *   • VerificationModal      — peer verification form
+ *
+ * FAB (floating action button): "+" to add washroom.
+ * Long-press on map: drops a pin at that coordinate and opens AddWashroomModal.
+ */
+
+import React, { useState, useCallback } from 'react'
+import {
+  View, StyleSheet, TouchableOpacity, Platform,
+} from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
+import { WaterPottyMapView } from '../../components/map/MapView'
+import { AddWashroomModal } from '../../components/washroom/AddWashroomModal'
+import { VerificationPrompt } from '../../components/washroom/VerificationPrompt'
+import { VerificationModal } from '../../components/washroom/VerificationModal'
+import { useNearbyVerifications } from '../../hooks/useNearbyVerifications'
+import { useAuth } from '../../contexts/AuthContext'
 
 export default function MapScreen() {
+  const { profile } = useAuth()
+
+  // Add washroom state
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [mapPressCoords, setMapPressCoords] = useState<{
+    lat: number; lng: number
+  } | null>(null)
+
+  // Active pin state (passed to VerificationPrompt for positioning)
+  const [hasActivePin, setHasActivePin] = useState(false)
+
+  // Verification flow
+  const {
+    nearestPending,
+    showPrompt,
+    showModal: showVerifyModal,
+    dismissPrompt,
+    openModal: openVerifyModal,
+    closeModal: closeVerifyModal,
+    handleResolved,
+  } = useNearbyVerifications()
+
+  // ── Open Add modal ────────────────────────────────────────────────────────
+
+  const handleFABPress = useCallback(() => {
+    setMapPressCoords(null)   // use GPS
+    setShowAddModal(true)
+  }, [])
+
+  const handleMapLongPress = useCallback((lat: number, lng: number) => {
+    setMapPressCoords({ lat, lng })
+    setShowAddModal(true)
+  }, [])
+
+  const handleAddClose = useCallback(() => {
+    setShowAddModal(false)
+    setMapPressCoords(null)
+  }, [])
+
+  const handleAddSuccess = useCallback((_washroomId: string) => {
+    setShowAddModal(false)
+    setMapPressCoords(null)
+  }, [])
+
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <View className="flex-1 items-center justify-center">
-        <Text className="text-xl font-semibold text-gray-900">Map</Text>
-        <Text className="text-sm text-gray-500 mt-2 text-center px-8">
-          Mapbox map with washroom pins will render here.{'\n'}
-          Implement in Phase 4.
-        </Text>
-        {/* TODO Phase 4: Add @rnmapbox/maps MapView, WashroomMarker, PinBottomSheet */}
-      </View>
-    </SafeAreaView>
+    <View style={styles.root}>
+      {/* ── Map ────────────────────────────────────────────────────────────── */}
+      <WaterPottyMapView
+        onLongPress={handleMapLongPress}
+        onPinCreated={() => setHasActivePin(true)}
+        onPinReleased={() => setHasActivePin(false)}
+      />
+
+      {/* ── FAB: Add Washroom ───────────────────────────────────────────────── */}
+      {profile?.tier === 'subscriber' && (
+        <TouchableOpacity
+          style={[styles.fab, hasActivePin && styles.fabRaised]}
+          onPress={handleFABPress}
+          activeOpacity={0.85}
+        >
+          <Ionicons name="add" size={28} color="#fff" />
+        </TouchableOpacity>
+      )}
+
+      {/* ── Verification prompt (nearby pending washroom banner) ──────────── */}
+      {showPrompt && nearestPending && !showAddModal && (
+        <VerificationPrompt
+          washroom={{
+            id:        nearestPending.washroomId,
+            name:      nearestPending.name,
+            type:      nearestPending.type,
+            distanceM: nearestPending.distanceM,
+          }}
+          hasActivePin={hasActivePin}
+          onVerify={openVerifyModal}
+          onSkip={dismissPrompt}
+        />
+      )}
+
+      {/* ── Add Washroom modal ─────────────────────────────────────────────── */}
+      {showAddModal && (
+        <AddWashroomModal
+          initialLat={mapPressCoords?.lat}
+          initialLng={mapPressCoords?.lng}
+          onClose={handleAddClose}
+          onSuccess={handleAddSuccess}
+        />
+      )}
+
+      {/* ── Verification modal ─────────────────────────────────────────────── */}
+      {showVerifyModal && nearestPending && (
+        <VerificationModal
+          verification={{
+            id: nearestPending.verificationId,
+            washroom: {
+              id:           nearestPending.washroomId,
+              name:         nearestPending.name,
+              type:         nearestPending.type,
+              lat:          nearestPending.lat,
+              lng:          nearestPending.lng,
+              is_pay_to_use: nearestPending.is_pay_to_use,
+              created_at:   nearestPending.created_at,
+            },
+            submitter_username: nearestPending.submitterUsername,
+          }}
+          onClose={closeVerifyModal}
+          onResolved={handleResolved}
+        />
+      )}
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  root: { flex: 1 },
+
+  fab: {
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 106 : 80, // above tab bar
+    right: 20,
+    width: 54, height: 54, borderRadius: 27,
+    backgroundColor: '#0D7EC4',
+    alignItems: 'center', justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 8,
+  },
+  // Push FAB up when PinTimer is visible (timer height ~62 + gap)
+  fabRaised: {
+    bottom: Platform.OS === 'ios' ? 178 : 152,
+  },
+})
