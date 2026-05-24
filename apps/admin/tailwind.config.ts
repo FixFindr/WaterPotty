@@ -24,6 +24,7 @@ const config: Config = {
           red:     '#C62828',  // danger / badge
           green:   '#4ade80',  // success / open action
           amber:   '#fbbf24',  // warning / pending action
+          gold:    '#e9b949',  // admin role / high-value accent
           depth:   '#0A1628',  // panel / table background
           muted:   '#142236',  // subtle hover background
         },
