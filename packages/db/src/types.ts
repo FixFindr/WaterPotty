@@ -203,10 +203,11 @@ export type Database = {
           created_at: string
           email: string | null
           id: string
+          revenuecat_customer_id: string | null
           role: Database['public']['Enums']['user_role']
-          stripe_customer_id: string | null
           subscription_expires_at: string | null
           tier: Database['public']['Enums']['user_tier']
+          updated_at: string
         }
         Insert: {
           anonymous_username: string
@@ -214,10 +215,11 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          revenuecat_customer_id?: string | null
           role?: Database['public']['Enums']['user_role']
-          stripe_customer_id?: string | null
           subscription_expires_at?: string | null
           tier?: Database['public']['Enums']['user_tier']
+          updated_at?: string
         }
         Update: {
           anonymous_username?: string
@@ -225,10 +227,11 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          revenuecat_customer_id?: string | null
           role?: Database['public']['Enums']['user_role']
-          stripe_customer_id?: string | null
           subscription_expires_at?: string | null
           tier?: Database['public']['Enums']['user_tier']
+          updated_at?: string
         }
         Relationships: []
       }
