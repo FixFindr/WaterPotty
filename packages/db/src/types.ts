@@ -360,6 +360,10 @@ export type Database = {
       }
     }
     Functions: {
+      get_tier: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_user_credit_balance: {
         Args: {
           p_user_id: string
