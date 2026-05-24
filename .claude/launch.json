@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "admin",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--workspace=water-potty-admin"],
+      "port": 3001
+    },
+    {
+      "name": "mobile",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start", "--workspace=@water-potty/mobile", "--", "--port", "8082"],
+      "port": 8082
+    }
+  ]
+}

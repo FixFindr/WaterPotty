@@ -267,11 +267,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
 
-    // RevenueCat — StoreKit 2 (iOS) + Google Play Billing (Android)
-    // API keys are set at runtime in lib/revenuecat.ts
-    // This plugin only handles native framework linking
-    'react-native-purchases',
-
     // Native build properties
     [
       'expo-build-properties',
