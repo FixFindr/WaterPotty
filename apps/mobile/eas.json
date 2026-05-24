@@ -1,43 +1,95 @@
 {
+  "$schema": "https://raw.githubusercontent.com/expo/eas-cli/main/packages/eas-cli/schema/eas.schema.json",
+
   "cli": {
-    "version": ">= 12.0.0"
+    "version": ">= 10.0.0",
+    "appVersionSource": "remote"
   },
+
   "build": {
     "development": {
       "developmentClient": true,
       "distribution": "internal",
       "ios": {
-        "simulator": true
+        "simulator": false,
+        "resourceClass": "m-medium"
+      },
+      "android": {
+        "buildType": "apk",
+        "resourceClass": "medium"
+      },
+      "env": {
+        "APP_ENV": "development"
       }
     },
+
+    "development-simulator": {
+      "extends": "development",
+      "ios": {
+        "simulator": true,
+        "resourceClass": "m-medium"
+      }
+    },
+
     "preview": {
       "distribution": "internal",
       "ios": {
+        "resourceClass": "m-medium",
         "simulator": false
       },
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "resourceClass": "medium"
+      },
+      "channel": "preview",
+      "env": {
+        "APP_ENV": "preview"
       }
     },
+
     "production": {
-      "autoIncrement": true,
+      "distribution": "store",
       "ios": {
-        "simulator": false
+        "resourceClass": "m-medium",
+        "simulator": false,
+        "image": "latest"
       },
       "android": {
-        "buildType": "app-bundle"
-      }
+        "buildType": "app-bundle",
+        "resourceClass": "medium",
+        "image": "latest"
+      },
+      "channel": "production",
+      "env": {
+        "APP_ENV": "production"
+      },
+      "autoIncrement": true
     }
   },
+
   "submit": {
     "production": {
       "ios": {
-        "appleId": "YOUR_APPLE_ID",
-        "ascAppId": "YOUR_APP_STORE_CONNECT_APP_ID"
+        "appleId": "admin@fixfindr.com",
+        "ascAppId": "REPLACE_WITH_APP_STORE_CONNECT_APP_ID",
+        "appleTeamId": "REPLACE_WITH_APPLE_TEAM_ID"
       },
       "android": {
         "serviceAccountKeyPath": "./google-service-account.json",
-        "track": "internal"
+        "track": "internal",
+        "releaseStatus": "draft"
+      }
+    },
+    "preview": {
+      "ios": {
+        "appleId": "admin@fixfindr.com",
+        "ascAppId": "REPLACE_WITH_APP_STORE_CONNECT_APP_ID",
+        "appleTeamId": "REPLACE_WITH_APPLE_TEAM_ID"
+      },
+      "android": {
+        "serviceAccountKeyPath": "./google-service-account.json",
+        "track": "internal",
+        "releaseStatus": "draft"
       }
     }
   }
