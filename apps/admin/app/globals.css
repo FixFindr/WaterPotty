@@ -59,6 +59,25 @@
 }
 
 @layer utilities {
+  /* ── Status badges ─────────────────────────────────────────────────────── */
+  .wp-badge-open     { @apply bg-emerald-900/40 text-emerald-400 border border-emerald-700/40; }
+  .wp-badge-pinned   { @apply bg-yellow-900/40 text-yellow-400 border border-yellow-700/40; }
+  .wp-badge-occupied { @apply bg-red-900/40 text-red-400 border border-red-700/40; }
+  .wp-badge-closed   { @apply bg-wp-surface text-wp-smoke border border-wp-rim; }
+  .wp-badge-pending  { @apply bg-blue-900/40 text-blue-400 border border-blue-700/40; }
+  .wp-badge-sub      { @apply bg-wp-iceDim text-wp-ice border border-wp-rim; }
+
+  /* ── Table utilities ────────────────────────────────────────────────────── */
+  .wp-table-head {
+    @apply px-3 py-2.5 text-left text-[10px] font-semibold tracking-widest text-wp-smoke uppercase;
+  }
+  .wp-table-row {
+    @apply border-t border-wp-rim hover:bg-wp-muted transition-colors duration-100;
+  }
+  .wp-table-cell {
+    @apply px-3 py-2.5 align-middle;
+  }
+
   /* Subtle CRT scanline effect for the admin header */
   .wp-scanline {
     background-image: repeating-linear-gradient(
