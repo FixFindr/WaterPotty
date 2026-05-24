@@ -10,53 +10,34 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // ── Water Potty admin control-room palette ────────────────────────
         wp: {
-          void:    '#050D18',  // page background
-          abyss:   '#080F1E',  // sidebar / secondary bg
-          surface: '#0D1B2E',  // card / selected item bg
-          rim:     '#1A2F45',  // border
-          ice:     '#4FC3F7',  // ice-blue accent text
-          iceDim:  'rgba(79,195,247,0.15)',  // dim ice background
-          mist:    '#B0CAD9',  // lighter body text
-          fog:     '#7BA7C2',  // medium body text
-          smoke:   '#4A6880',  // dim / placeholder text
-          red:     '#C62828',  // danger / badge
-          green:   '#4ade80',  // success / open action
-          amber:   '#fbbf24',  // warning / pending action
-          gold:    '#e9b949',  // admin role / high-value accent
-          depth:   '#0A1628',  // panel / table background
-          muted:   '#142236',  // subtle hover background
+          void:    '#070D17',
+          abyss:   '#0A1220',
+          depth:   '#0F1C2E',
+          surface: '#152236',
+          rim:     '#1E3248',
+          muted:   '#2A4560',
+          mist:    '#C8DCF0',
+          fog:     '#7A9BB8',
+          smoke:   '#3D5A73',
+          ice:     '#4FC3F7',
+          iceDim:  '#1A5F82',
+          green:   '#34A853',
+          amber:   '#E8A020',
+          red:     '#D93025',
+          gold:    '#F4B400',
         },
-        border:      'hsl(var(--border))',
-        input:       'hsl(var(--input))',
-        ring:        'hsl(var(--ring))',
-        background:  'hsl(var(--background))',
-        foreground:  'hsl(var(--foreground))',
-        primary: {
-          DEFAULT:    'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
-        },
-        secondary: {
-          DEFAULT:    'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
-        },
-        destructive: {
-          DEFAULT:    'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))',
-        },
-        muted: {
-          DEFAULT:    'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
-        },
-        accent: {
-          DEFAULT:    'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
-        },
-        card: {
-          DEFAULT:    'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
-        },
+        border:     'var(--wp-rim)',
+        background: 'var(--wp-void)',
+        foreground: 'var(--wp-mist)',
+        card:       { DEFAULT: 'var(--wp-depth)', foreground: 'var(--wp-mist)' },
+        primary:    { DEFAULT: 'var(--wp-ice)',   foreground: 'var(--wp-void)' },
+        muted:      { DEFAULT: 'var(--wp-surface)', foreground: 'var(--wp-fog)' },
+        destructive:{ DEFAULT: 'var(--wp-red)',   foreground: '#ffffff' },
+      },
+      fontFamily: {
+        mono: ['var(--font-geist-mono)', 'Courier New', 'monospace'],
+        sans: ['var(--font-geist-mono)', 'Courier New', 'monospace'], // mono-first
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -65,7 +46,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [require('tailwindcss-animate')],
 }
 
 export default config
