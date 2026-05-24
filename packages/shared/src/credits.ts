@@ -9,14 +9,16 @@ import type { CreditReason } from './types'
 // | Manual admin adjustment           | ±n    | Admin dashboard server action   |
 
 export const CREDIT_DELTAS: Record<CreditReason, number> = {
-  washroom_verified:       +2,
-  subscription_renewal:    -5,
-  manual_admin_adjustment:  0,  // amount set dynamically by admin
+  washroom_verified:     +2,
+  subscription_renewal:  -5,
+  subscription_partial:   0,  // amount set dynamically
+  manual_admin_adjust:    0,  // amount set dynamically by admin
+  bonus:                  0,  // amount set dynamically
 } as const
 
 /**
  * Returns the credit delta for a standard credit event.
- * Returns 0 for manual_admin_adjustment — the admin sets the delta explicitly.
+ * Returns 0 for variable-amount reasons — the caller sets the delta explicitly.
  */
 export function getCreditDelta(reason: CreditReason): number {
   return CREDIT_DELTAS[reason]

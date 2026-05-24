@@ -24,6 +24,7 @@ export type Database = {
           created_at: string
           delta: number
           id: string
+          note: string | null
           reason: Database['public']['Enums']['credit_reason']
           reference_id: string | null
           user_id: string
@@ -32,6 +33,7 @@ export type Database = {
           created_at?: string
           delta: number
           id?: string
+          note?: string | null
           reason: Database['public']['Enums']['credit_reason']
           reference_id?: string | null
           user_id: string
@@ -40,6 +42,7 @@ export type Database = {
           created_at?: string
           delta?: number
           id?: string
+          note?: string | null
           reason?: Database['public']['Enums']['credit_reason']
           reference_id?: string | null
           user_id?: string
@@ -348,7 +351,13 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_credit_balances: {
+        Row: {
+          credits: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_user_credit_balance: {
@@ -371,7 +380,9 @@ export type Database = {
       credit_reason:
         | 'washroom_verified'
         | 'subscription_renewal'
-        | 'manual_admin_adjustment'
+        | 'subscription_partial'
+        | 'manual_admin_adjust'
+        | 'bonus'
       flag_reason:
         | 'closed_permanently'
         | 'doesnt_exist'
