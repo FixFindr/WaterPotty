@@ -10,6 +10,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // ── Water Potty admin control-room palette ────────────────────────
+        wp: {
+          void:    '#050D18',  // page background
+          abyss:   '#080F1E',  // sidebar / secondary bg
+          surface: '#0D1B2E',  // card / selected item bg
+          rim:     '#1A2F45',  // border
+          ice:     '#4FC3F7',  // ice-blue accent text
+          iceDim:  'rgba(79,195,247,0.15)',  // dim ice background
+          mist:    '#B0CAD9',  // lighter body text
+          fog:     '#7BA7C2',  // medium body text
+          smoke:   '#4A6880',  // dim / placeholder text
+          red:     '#C62828',  // danger / badge
+        },
         border:      'hsl(var(--border))',
         input:       'hsl(var(--input))',
         ring:        'hsl(var(--ring))',

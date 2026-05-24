@@ -57,3 +57,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  /* Subtle CRT scanline effect for the admin header */
+  .wp-scanline {
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.04) 2px,
+      rgba(0, 0, 0, 0.04) 4px
+    );
+  }
+}
