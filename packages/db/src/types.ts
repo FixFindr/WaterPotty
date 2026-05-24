@@ -199,6 +199,48 @@ export type Database = {
           },
         ]
       }
+      notification_queue: {
+        Row: {
+          created_at: string
+          id: string
+          sent: boolean
+          type: Database['public']['Enums']['notification_type']
+          user_id: string
+          washroom_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          sent?: boolean
+          type: Database['public']['Enums']['notification_type']
+          user_id: string
+          washroom_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          sent?: boolean
+          type?: Database['public']['Enums']['notification_type']
+          user_id?: string
+          washroom_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'notification_queue_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'notification_queue_washroom_id_fkey'
+            columns: ['washroom_id']
+            isOneToOne: false
+            referencedRelation: 'washrooms'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       users: {
         Row: {
           anonymous_username: string
@@ -392,6 +434,7 @@ export type Database = {
         | 'doesnt_exist'
         | 'incorrect_info'
         | 'inappropriate'
+      notification_type: 'pin_expiring_soon' | 'verification_needed'
       user_role: 'user' | 'admin'
       user_tier: 'free' | 'subscriber'
       verification_status: 'pending' | 'approved' | 'rejected'
