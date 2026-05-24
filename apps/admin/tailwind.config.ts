@@ -22,6 +22,10 @@ const config: Config = {
           fog:     '#7BA7C2',  // medium body text
           smoke:   '#4A6880',  // dim / placeholder text
           red:     '#C62828',  // danger / badge
+          green:   '#4ade80',  // success / open action
+          amber:   '#fbbf24',  // warning / pending action
+          depth:   '#0A1628',  // panel / table background
+          muted:   '#142236',  // subtle hover background
         },
         border:      'hsl(var(--border))',
         input:       'hsl(var(--input))',
