@@ -229,7 +229,7 @@ export function WaterPottyMapView({ onLongPress, onPinCreated, onPinReleased }: 
         logoEnabled={false}
         attributionEnabled={false}
         compassEnabled
-        onRegionDidChange={handleRegionDidChange}
+        onMapIdle={handleRegionDidChange}
         onLongPress={handleMapLongPress}
       >
         {/* Camera */}
