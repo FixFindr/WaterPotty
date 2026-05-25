@@ -19,6 +19,7 @@ import {
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { WaterPottyMapView } from '../../components/map/MapView'
+import { LocationSearchBar } from '../../components/map/LocationSearchBar'
 import { AddWashroomModal } from '../../components/washroom/AddWashroomModal'
 import { VerificationPrompt } from '../../components/washroom/VerificationPrompt'
 import { VerificationModal } from '../../components/washroom/VerificationModal'
@@ -27,6 +28,10 @@ import { useAuth } from '../../contexts/AuthContext'
 
 export default function MapScreen() {
   const { profile } = useAuth()
+
+  // Search / fly-to state
+  const [flyToCoord, setFlyToCoord] = useState<[number, number] | null>(null)
+  const [userCoord, setUserCoord] = useState<[number, number] | null>(null)
 
   // Add washroom state
   const [showAddModal, setShowAddModal] = useState(false)
@@ -77,6 +82,14 @@ export default function MapScreen() {
         onLongPress={handleMapLongPress}
         onPinCreated={() => setHasActivePin(true)}
         onPinReleased={() => setHasActivePin(false)}
+        flyToCoord={flyToCoord}
+        onUserCoordReady={setUserCoord}
+      />
+
+      {/* ── Location search bar ─────────────────────────────────────────────── */}
+      <LocationSearchBar
+        userCoord={userCoord}
+        onSelectLocation={(coord) => setFlyToCoord(coord)}
       />
 
       {/* ── FAB: Add Washroom ───────────────────────────────────────────────── */}

@@ -40,6 +40,10 @@ interface Props {
   onPinCreated?: () => void
   /** Called after a pin is released or expired. */
   onPinReleased?: () => void
+  /** When set, flies the camera to this [lng, lat] coordinate. */
+  flyToCoord?: [number, number] | null
+  /** Called once with the user's [lng, lat] after location permission is granted. */
+  onUserCoordReady?: (coord: [number, number]) => void
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -56,7 +60,7 @@ function kmToDegrees(km: number) {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function WaterPottyMapView({ onLongPress, onPinCreated, onPinReleased }: Props = {}) {
+export function WaterPottyMapView({ onLongPress, onPinCreated, onPinReleased, flyToCoord, onUserCoordReady }: Props = {}) {
   const { session, profile } = useAuth()
 
   const mapRef = useRef<MapboxGL.MapView>(null)
@@ -82,6 +86,7 @@ export function WaterPottyMapView({ onLongPress, onPinCreated, onPinReleased }: 
       const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })
       const coords: [number, number] = [loc.coords.longitude, loc.coords.latitude]
       setUserCoords(coords)
+      onUserCoordReady?.(coords)
 
       cameraRef.current?.setCamera({
         centerCoordinate: coords,
@@ -93,6 +98,17 @@ export function WaterPottyMapView({ onLongPress, onPinCreated, onPinReleased }: 
       setLoading(false)
     })()
   }, [])
+
+  // ── Fly to searched location ──────────────────────────────────────────────
+  useEffect(() => {
+    if (!flyToCoord) return
+    cameraRef.current?.setCamera({
+      centerCoordinate: flyToCoord,
+      zoomLevel: DEFAULT_ZOOM,
+      animationDuration: 600,
+    })
+    loadWashrooms(flyToCoord)
+  }, [flyToCoord]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Load washrooms within bounding box ───────────────────────────────────
   const loadWashrooms = useCallback(async (centre: [number, number]) => {
