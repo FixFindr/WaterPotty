@@ -92,6 +92,7 @@ export default function MapScreen() {
         onSelectLocation={(coord) => setFlyToCoord(coord)}
       />
 
+
       {/* ── FAB: Add Washroom ───────────────────────────────────────────────── */}
       {profile?.tier === 'subscriber' && (
         <TouchableOpacity
