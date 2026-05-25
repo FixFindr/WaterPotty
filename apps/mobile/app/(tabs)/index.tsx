@@ -5,6 +5,7 @@
  *
  * Orchestrates all map-layer components:
  *   • WaterPottyMapView      — Mapbox map + markers + PinTimer
+ *   • LocationSearchBar      — dual origin/destination search
  *   • AddWashroomModal       — subscriber add-washroom flow (FAB / long press)
  *   • VerificationPrompt     — nearby pending washroom banner
  *   • VerificationModal      — peer verification form
@@ -13,7 +14,7 @@
  * Long-press on map: drops a pin at that coordinate and opens AddWashroomModal.
  */
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import {
   View, StyleSheet, TouchableOpacity, Platform,
 } from 'react-native'
@@ -26,23 +27,38 @@ import { VerificationModal } from '../../components/washroom/VerificationModal'
 import { useNearbyVerifications } from '../../hooks/useNearbyVerifications'
 import { useAuth } from '../../contexts/AuthContext'
 
+// ─── Route GeoJSON type ───────────────────────────────────────────────────────
+
+export interface RouteGeoJSON {
+  type: 'Feature'
+  properties: Record<string, unknown>
+  geometry: {
+    type: 'LineString'
+    coordinates: [number, number][]
+  }
+}
+
 export default function MapScreen() {
   const { profile } = useAuth()
 
-  // Search / fly-to state
-  const [flyToCoord, setFlyToCoord] = useState<[number, number] | null>(null)
-  const [userCoord, setUserCoord] = useState<[number, number] | null>(null)
+  // ── Search / navigation state ───────────────────────────────────────────
+  const [userCoord, setUserCoord]           = useState<[number, number] | null>(null)
+  const [flyToCoord, setFlyToCoord]         = useState<[number, number] | null>(null)
+  const [originCoord, setOriginCoord]       = useState<[number, number] | null>(null)
+  const [destinationCoord, setDestCoord]    = useState<[number, number] | null>(null)
+  const [routeGeoJSON, setRouteGeoJSON]     = useState<RouteGeoJSON | null>(null)
+  const [routeFetching, setRouteFetching]   = useState(false)
 
-  // Add washroom state
+  // ── Add washroom state ──────────────────────────────────────────────────
   const [showAddModal, setShowAddModal] = useState(false)
   const [mapPressCoords, setMapPressCoords] = useState<{
     lat: number; lng: number
   } | null>(null)
 
-  // Active pin state (passed to VerificationPrompt for positioning)
+  // ── Active pin state ────────────────────────────────────────────────────
   const [hasActivePin, setHasActivePin] = useState(false)
 
-  // Verification flow
+  // ── Verification flow ───────────────────────────────────────────────────
   const {
     nearestPending,
     showPrompt,
@@ -53,10 +69,58 @@ export default function MapScreen() {
     handleResolved,
   } = useNearbyVerifications()
 
-  // ── Open Add modal ────────────────────────────────────────────────────────
+  // ── Fetch walking route when both coords are set ────────────────────────
+  useEffect(() => {
+    const origin = originCoord ?? userCoord
+    if (!origin || !destinationCoord) {
+      setRouteGeoJSON(null)
+      return
+    }
 
+    let cancelled = false
+    setRouteFetching(true)
+
+    const token = process.env.EXPO_PUBLIC_MAPBOX_TOKEN!
+    const url =
+      `https://api.mapbox.com/directions/v5/mapbox/walking/` +
+      `${origin[0]},${origin[1]};${destinationCoord[0]},${destinationCoord[1]}` +
+      `?access_token=${token}&geometries=geojson&overview=full`
+
+    fetch(url)
+      .then(r => r.json())
+      .then(json => {
+        if (cancelled) return
+        if (json.routes?.[0]) {
+          setRouteGeoJSON({
+            type: 'Feature',
+            properties: {},
+            geometry: json.routes[0].geometry,
+          })
+        }
+      })
+      .catch(() => { /* silently ignore network errors */ })
+      .finally(() => { if (!cancelled) setRouteFetching(false) })
+
+    return () => { cancelled = true }
+  }, [originCoord, destinationCoord, userCoord])
+
+  // ── Search bar handler ──────────────────────────────────────────────────
+  const handleSelectLocation = useCallback((
+    coord: [number, number],
+    _placeName: string,
+    field: 'origin' | 'destination' | null,
+  ) => {
+    if (field === 'origin') {
+      setOriginCoord(coord)
+    } else {
+      setDestCoord(coord)
+      setFlyToCoord(coord) // fly to destination while route loads
+    }
+  }, [])
+
+  // ── Add washroom handlers ───────────────────────────────────────────────
   const handleFABPress = useCallback(() => {
-    setMapPressCoords(null)   // use GPS
+    setMapPressCoords(null)
     setShowAddModal(true)
   }, [])
 
@@ -84,14 +148,14 @@ export default function MapScreen() {
         onPinReleased={() => setHasActivePin(false)}
         flyToCoord={flyToCoord}
         onUserCoordReady={setUserCoord}
+        routeGeoJSON={routeGeoJSON}
       />
 
       {/* ── Location search bar ─────────────────────────────────────────────── */}
       <LocationSearchBar
         userCoord={userCoord}
-        onSelectLocation={(coord) => setFlyToCoord(coord)}
+        onSelectLocation={handleSelectLocation}
       />
-
 
       {/* ── FAB: Add Washroom ───────────────────────────────────────────────── */}
       {profile?.tier === 'subscriber' && (
@@ -158,7 +222,7 @@ const styles = StyleSheet.create({
 
   fab: {
     position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 106 : 80, // above tab bar
+    bottom: Platform.OS === 'ios' ? 106 : 80,
     right: 20,
     width: 54, height: 54, borderRadius: 27,
     backgroundColor: '#0D7EC4',
@@ -169,7 +233,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     elevation: 8,
   },
-  // Push FAB up when PinTimer is visible (timer height ~62 + gap)
   fabRaised: {
     bottom: Platform.OS === 'ios' ? 178 : 152,
   },

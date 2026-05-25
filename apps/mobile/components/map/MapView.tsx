@@ -12,7 +12,7 @@
  *   - Shows the active pin timer if the user has a pin
  */
 
-import React, { useEffect, useRef, useState, useCallback } from 'react'
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { StyleSheet, View, Platform, ActivityIndicator, Text } from 'react-native'
 import MapboxGL from '@rnmapbox/maps'
 import * as Location from 'expo-location'
@@ -21,6 +21,7 @@ import { WashroomMarker } from './WashroomMarker'
 import { PinBottomSheet } from './PinBottomSheet'
 import { PinTimer } from './PinTimer'
 import type { WashroomForMarker } from '@water-potty/shared'
+import type { RouteGeoJSON } from '../../app/(tabs)/index'
 import { useAuth } from '../../contexts/AuthContext'
 
 // Initialise Mapbox — token comes from env
@@ -44,6 +45,8 @@ interface Props {
   flyToCoord?: [number, number] | null
   /** Called once with the user's [lng, lat] after location permission is granted. */
   onUserCoordReady?: (coord: [number, number]) => void
+  /** Walking route GeoJSON to render on the map. Camera fits to its bounds. */
+  routeGeoJSON?: RouteGeoJSON | null
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -60,7 +63,7 @@ function kmToDegrees(km: number) {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function WaterPottyMapView({ onLongPress, onPinCreated, onPinReleased, flyToCoord, onUserCoordReady }: Props = {}) {
+export function WaterPottyMapView({ onLongPress, onPinCreated, onPinReleased, flyToCoord, onUserCoordReady, routeGeoJSON }: Props = {}) {
   const { session, profile } = useAuth()
 
   const mapRef = useRef<MapboxGL.MapView>(null)
@@ -109,6 +112,19 @@ export function WaterPottyMapView({ onLongPress, onPinCreated, onPinReleased, fl
     })
     loadWashrooms(flyToCoord)
   }, [flyToCoord]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Fit camera to route bounds when route changes ─────────────────────────
+  useEffect(() => {
+    if (!routeGeoJSON) return
+    const coords = routeGeoJSON.geometry.coordinates
+    if (coords.length < 2) return
+    const lngs = coords.map(c => c[0])
+    const lats = coords.map(c => c[1])
+    const ne: [number, number] = [Math.max(...lngs), Math.max(...lats)]
+    const sw: [number, number] = [Math.min(...lngs), Math.min(...lats)]
+    // padding: [top, right, bottom, left] in points
+    cameraRef.current?.fitBounds(ne, sw, [160, 60, 80, 60], 800)
+  }, [routeGeoJSON])
 
   // ── Load washrooms within bounding box ───────────────────────────────────
   const loadWashrooms = useCallback(async (centre: [number, number]) => {
@@ -264,6 +280,34 @@ export function WaterPottyMapView({ onLongPress, onPinCreated, onPinReleased, fl
             showsUserHeadingIndicator
             androidRenderMode="compass"
           />
+        )}
+
+        {/* Walking route line */}
+        {routeGeoJSON && (
+          <MapboxGL.ShapeSource id="walking-route" shape={routeGeoJSON}>
+            {/* Casing — white outline for contrast */}
+            <MapboxGL.LineLayer
+              id="route-casing"
+              style={{
+                lineColor: '#fff',
+                lineWidth: 7,
+                lineCap: 'round',
+                lineJoin: 'round',
+                lineOpacity: 0.9,
+              }}
+            />
+            {/* Main route line */}
+            <MapboxGL.LineLayer
+              id="route-line"
+              style={{
+                lineColor: '#0D7EC4',
+                lineWidth: 4,
+                lineCap: 'round',
+                lineJoin: 'round',
+                lineOpacity: 0.95,
+              }}
+            />
+          </MapboxGL.ShapeSource>
         )}
 
         {/* Washroom markers */}
